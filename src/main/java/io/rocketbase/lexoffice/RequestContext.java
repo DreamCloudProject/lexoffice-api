@@ -8,10 +8,15 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public class RequestContext {
 
@@ -23,13 +28,24 @@ public class RequestContext {
     private long throttlePeriod = 510;
 
     RequestContext(LexofficeApiBuilder apiBuilder) {
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter(getObjectMapper());
+
+        List<MediaType> byteSupportedTypes = new ArrayList<>();
+        byteSupportedTypes.add(MediaType.ALL);
+        ByteArrayHttpMessageConverter byteConverter = new ByteArrayHttpMessageConverter();
+        byteConverter.setSupportedMediaTypes(byteSupportedTypes);
+
+        List<HttpMessageConverter<?>> messageConverters = new ArrayList<>();
+        messageConverters.add(byteConverter);
+        messageConverters.add(jsonConverter);
+
         this.apiBuilder = apiBuilder;
 
         this.httpClient = HttpClientBuilder.create()
                 .build();
         this.requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         restTemplate = new RestTemplate(requestFactory);
-        restTemplate.setMessageConverters(Arrays.asList(new MappingJackson2HttpMessageConverter(getObjectMapper())));
+        restTemplate.setMessageConverters(messageConverters);
     }
 
 

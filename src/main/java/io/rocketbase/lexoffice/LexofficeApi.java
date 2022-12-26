@@ -1,6 +1,7 @@
 package io.rocketbase.lexoffice;
 
 import io.rocketbase.lexoffice.chain.ContactChain;
+import io.rocketbase.lexoffice.chain.FilesChain;
 import io.rocketbase.lexoffice.chain.InvoiceChain;
 import io.rocketbase.lexoffice.chain.QuotationChain;
 import io.rocketbase.lexoffice.chain.VoucherListChain;
@@ -32,6 +33,10 @@ public class LexofficeApi {
 
     public QuotationChain quotation() {
         return new QuotationChain(context);
+    }
+
+    public FilesChain files() {
+        return new FilesChain(context);
     }
 
 }

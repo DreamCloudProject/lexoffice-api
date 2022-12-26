@@ -1,6 +1,7 @@
 package io.rocketbase.lexoffice.chain;
 
 import io.rocketbase.lexoffice.RequestContext;
+import io.rocketbase.lexoffice.model.Files;
 import io.rocketbase.lexoffice.model.Invoice;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -18,6 +19,10 @@ public class InvoiceChain {
 
     public Create create() {
         return new Create(context);
+    }
+
+    public Files render(String id) {
+        return new Render(context).render(id);
     }
 
     protected static class Get extends ExecutableRequestChain {
@@ -52,6 +57,21 @@ public class InvoiceChain {
         @SneakyThrows
         public Invoice submit(Invoice invoice) {
             return getContext().execute(getUriBuilder(), HttpMethod.POST, invoice, TYPE_REFERENCE);
+        }
+    }
+
+    public static class Render extends ExecutableRequestChain {
+        private static final ParameterizedTypeReference<Files> TYPE_REFERENCE = new ParameterizedTypeReference<Files>() {
+        };
+
+        public Render(RequestContext context) {
+            super(context, "/invoices");
+        }
+
+        @SneakyThrows
+        public Files render(String id) {
+            super.getUriBuilder().appendPath("/" + id).appendPath("/document");
+            return getContext().execute(getUriBuilder(), HttpMethod.GET, TYPE_REFERENCE);
         }
     }
 
