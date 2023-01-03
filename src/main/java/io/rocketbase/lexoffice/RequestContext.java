@@ -5,7 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -15,8 +19,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class RequestContext {
 
@@ -63,13 +67,22 @@ public class RequestContext {
     }
 
     public synchronized <E> E execute(RestUriBuilder uriBuilder, HttpMethod method, ParameterizedTypeReference<E> entityClass) {
-        return execute(uriBuilder, method, null, entityClass);
+        return execute(uriBuilder, null, method, null, entityClass);
     }
 
     public synchronized <E> E execute(RestUriBuilder uriBuilder, HttpMethod method, E body, ParameterizedTypeReference<E> entityClass) {
+        return execute(uriBuilder, null, method, body, entityClass);
+    }
+
+    public synchronized <E> E execute(RestUriBuilder uriBuilder, MediaType acceptMediaType, HttpMethod method, E body, ParameterizedTypeReference<E> entityClass) {
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        if(Objects.isNull(acceptMediaType)){
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        } else {
+            headers.setAccept(Arrays.asList(acceptMediaType));
+        }
+
         headers.add("Authorization", "Bearer " + apiBuilder.getApiToken());
 
         checkThrottlePeriod();
