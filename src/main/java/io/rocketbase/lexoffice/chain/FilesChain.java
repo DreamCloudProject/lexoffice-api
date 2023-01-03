@@ -1,11 +1,11 @@
 package io.rocketbase.lexoffice.chain;
 
 import io.rocketbase.lexoffice.RequestContext;
-import io.rocketbase.lexoffice.model.Files;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 
 @RequiredArgsConstructor
 public class FilesChain {
@@ -27,7 +27,7 @@ public class FilesChain {
         @SneakyThrows
         public byte[] get(String id) {
             getUriBuilder().appendPath("/" + id);
-            return getContext().execute(getUriBuilder(), HttpMethod.GET, TYPE_REFERENCE);
+            return getContext().execute(getUriBuilder(), MediaType.ALL, HttpMethod.GET, null, TYPE_REFERENCE);
         }
     }
 
