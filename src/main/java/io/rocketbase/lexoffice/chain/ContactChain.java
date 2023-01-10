@@ -140,7 +140,7 @@ public class ContactChain {
      */
     public Contact update(Contact contact) {
         Objects.requireNonNull(contact.getId());
-        return new Create(context).submit(contact);
+        return new Update(context).submit(contact);
     }
 
     public static class Update extends ExecutableRequestChain {
@@ -152,8 +152,9 @@ public class ContactChain {
         }
 
         @SneakyThrows
-        public Contact update(Contact contact) {
-            return getContext().execute(getUriBuilder().appendPath(contact.getId()), HttpMethod.PUT, contact, TYPE_REFERENCE);
+        public Contact submit(Contact contact) {
+            super.getUriBuilder().appendPath("/" + contact.getId());
+            return getContext().execute(getUriBuilder(), HttpMethod.PUT, contact, TYPE_REFERENCE);
         }
     }
 
